@@ -2,6 +2,15 @@
 
 namespace App\Entity;
 
+use App\Repository\BookRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/**
+ * @ORM\Entity(repositoryClass=BookRepository::class)
+ */
 class Book
 {
     /**
@@ -9,19 +18,21 @@ class Book
      * @ORM\GeneratedValue
      * @ORM\Column
      */
-    private $id;
+    private int $id;
     /**
      * @ORM\ManyToOne(targetEntity="Author", inversedBy="books")
      */
     private Author $author;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Genre", mappedBy="books"
+     * @ORM\ManyToMany(targetEntity="Genre", mappedBy="books")
      * @ORM\JoinTable(
      *     name="books_genre",
      *     joinColumns={
-     *         @JoinColumns(name="book_id", referencedColumnName="id"),
-     *         @InversedJoinColumn(name="genre_id", referencedColumnName="id")
+     *         @ORM\JoinColumn(name="book_id", referencedColumnName="id")
+     *     },
+     *     inverseJoinColumns={
+     *         @ORM\JoinColumn(name="genre_id", referencedColumnName="id")
      *     }
      * )
      */
@@ -31,13 +42,13 @@ class Book
      * @ORM\Column
      * @Assert\NotBlank
      */
-    private $title;
+    private string $title;
 
     /*
      * @ORM\Column(type="text")
      * @Assert\NotBlank
      */
-    private $description;
+    private string $description;
 
     public function __construct()
     {
@@ -45,57 +56,49 @@ class Book
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
     /**
-     * @param mixed $description
+     * @param string $description
      */
-    public function setDescription($description): void
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
     /**
-     * @param mixed $author
+     * @param Author|null $author
      */
-    public function setAuthor($author): void
+    public function setAuthor(Author|null $author): void
     {
         $this->author = $author;
     }
 
     /**
-     * @return mixed
+     * @return Author
      */
-    public function getAuthor()
+    public function getAuthor(): Author
     {
         return $this->author;
     }
 
     /**
-     * @param mixed $genres
+     * @return Collection
      */
-    public function setGenres($genres): void
-    {
-        $this->genres = $genres;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getGenres()
+    public function getGenres(): Collection
     {
         return $this->genres;
     }
@@ -103,16 +106,32 @@ class Book
     /**
      * @param mixed $title
      */
-    public function setTitle($title): void
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
+
+    public function addGenre(Genre $genre): void
+    {
+        if (!$this->genres->contains($genre)) {
+            $this->genres->add($genre);
+        }
+    }
+
+    public function removeGenre(Genre $genre): void
+    {
+        if ($this->genres->contains($genre)) {
+            $this->genres->removeElement($genre);
+        }
+    }
+
+
 }

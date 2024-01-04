@@ -37,6 +37,11 @@ class Product
     private $description;
 
     /**
+     * @ORM\ManyToOne(targetEntity=Category::class)
+     */
+    private $category;
+
+    /**
      * @return int|null
      */
     public function getId(): ?int
